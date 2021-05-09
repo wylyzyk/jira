@@ -8,6 +8,7 @@ export interface Users {
 }
 
 export interface Project {
+  // TODO: id 为number
   id: string;
   name: string;
   personId: string;
