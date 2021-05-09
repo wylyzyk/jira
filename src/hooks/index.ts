@@ -1,7 +1,23 @@
 import { useHttp } from "network/http";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Project, Users } from "typing";
 import { cleanObject } from "utils";
+
+export const useDocumentTitle = (title: string, keepOnUnmount = true) => {
+  let oldTitle = useRef(document.title).current;
+
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+
+  useEffect(() => {
+    return () => {
+      if (!keepOnUnmount) {
+        document.title = oldTitle;
+      }
+    };
+  }, [keepOnUnmount, oldTitle]);
+};
 
 // 初始化Hook
 export function useMount(callback: () => void) {
