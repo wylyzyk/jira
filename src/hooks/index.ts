@@ -1,7 +1,28 @@
 import { useHttp } from "network/http";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { URLSearchParamsInit, useSearchParams } from "react-router-dom";
 import { Project, Users } from "typing";
 import { cleanObject } from "utils";
+
+export const useUrlQueryParam = <T extends string>(keys: T[]) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  return [
+    useMemo(() => {
+      return keys.reduce((prev, key) => {
+        return { ...prev, [key]: searchParams.get(key) || "" };
+      }, {} as { [key in T]: string });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchParams]),
+    (params: Partial<{ [key in T]: unknown }>) => {
+      const o = cleanObject({
+        ...Object.fromEntries(searchParams),
+        ...params,
+      }) as URLSearchParamsInit;
+      return setSearchParams(o);
+    },
+  ] as const;
+};
 
 export const useDocumentTitle = (title: string, keepOnUnmount = true) => {
   let oldTitle = useRef(document.title).current;
@@ -140,6 +161,7 @@ export const useUsers = (param?: Partial<Users>) => {
 
   useEffect(() => {
     run(client("users", { data: cleanObject(param || {}) }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [param]);
 
   return result;

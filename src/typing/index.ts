@@ -1,3 +1,4 @@
+export type Raw = number | string;
 export interface Users {
   id: string;
   name: string;

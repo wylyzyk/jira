@@ -1,13 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import List from "./List";
 import Search from "./Search";
-import { useDebounce, useProjects, useUsers, useDocumentTitle } from "hooks";
+import {
+  useDebounce,
+  useProjects,
+  useUsers,
+  useDocumentTitle,
+  useUrlQueryParam,
+} from "hooks";
 import styled from "@emotion/styled";
 import { Typography } from "antd";
 // import { Helmet } from "react-helmet";
 
 export const ProjectList = () => {
-  const [param, setParam] = useState({ name: "", personId: "" });
+  const [param, setParam] = useUrlQueryParam(["name", "personId"]);
   const debouncedParam = useDebounce(param, 200);
   const { isLoading, error, data: list } = useProjects(debouncedParam);
   const { data: users } = useUsers();
@@ -25,6 +31,8 @@ export const ProjectList = () => {
     </Container>
   );
 };
+
+ProjectList.whyDidYouRender = false;
 
 const Container = styled.div`
   padding: 3.2rem;

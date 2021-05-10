@@ -7,6 +7,7 @@ import styled from "@emotion/styled";
 import { Row } from "components/style/lib";
 import { Button, Dropdown, Menu } from "antd";
 import ProjectItem from "components/ProjectItem";
+import { resetRouter } from "utils";
 
 const Authenticated = () => {
   return (
@@ -20,6 +21,7 @@ const Authenticated = () => {
               path={"/projects/:projectId/*"}
               element={<ProjectItem />}
             ></Route>
+            <Navigate to="/projects" />
           </Routes>
         </Router>
       </Main>
@@ -32,9 +34,11 @@ const PageHeader = () => {
   return (
     <Header between={true}>
       <HeaderLeft gap={true}>
-        <h1>Welcome Jira!</h1>
-        <h2>项目</h2>
-        <h2>用户</h2>
+        <Button type="link" onClick={resetRouter}>
+          <h1>Welcome Jira!</h1>
+        </Button>
+        <h3>项目</h3>
+        <h3>用户</h3>
       </HeaderLeft>
       <HeaderRight>
         <Dropdown
@@ -62,7 +66,9 @@ const Container = styled.div`
 `;
 
 const Header = styled(Row)`
-  padding: 3.2rem;
+  padding: 0 3.2rem;
+  text-align: center;
+  line-height: 6rem;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
   z-index: 1;
 `;

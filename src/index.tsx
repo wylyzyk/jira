@@ -1,3 +1,4 @@
+import "./wdyr";
 import { loadServer, DevTools } from "jira-dev-tool";
 import React from "react";
 import ReactDOM from "react-dom";

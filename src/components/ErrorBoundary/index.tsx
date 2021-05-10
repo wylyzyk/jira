@@ -1,4 +1,3 @@
-import { ImageProps } from "rc-image";
 import React, { Component } from "react";
 
 type FallbackRender = (props: { error: Error | null }) => React.ReactElement;
