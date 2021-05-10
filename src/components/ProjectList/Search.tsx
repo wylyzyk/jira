@@ -1,15 +1,12 @@
 // import { jsx } from "@emotion/react";
-
 import React, { FC } from "react";
 import { Form, Input, Select } from "antd";
-import { Users } from "../../typing";
+import { Project, Users } from "../../typing";
+import UserSelect from "components/UserSelect";
 
 interface IProps {
   users: Users[];
-  param: {
-    name: string;
-    personId: string;
-  };
+  param: Partial<Pick<Project, "name" | "personId">>;
   setParam: (param: IProps["param"]) => void;
 }
 const Search: FC<IProps> = ({ users, param, setParam }) => {
@@ -23,17 +20,11 @@ const Search: FC<IProps> = ({ users, param, setParam }) => {
         />
       </Form.Item>
       <Form.Item>
-        <Select
+        <UserSelect
+          defaultOptionName={"负责人"}
           value={param.personId}
           onChange={(value) => setParam({ ...param, personId: value })}
-        >
-          <Select.Option value="">负责人</Select.Option>
-          {users.map((user) => (
-            <Select.Option key={user.id} value={String(user.id)}>
-              {user.name}
-            </Select.Option>
-          ))}
-        </Select>
+        />
       </Form.Item>
     </Form>
   );

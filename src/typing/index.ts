@@ -1,6 +1,7 @@
 export type Raw = number | string;
+
 export interface Users {
-  id: string;
+  id: number;
   name: string;
   email: string;
   title: string;
@@ -9,10 +10,9 @@ export interface Users {
 }
 
 export interface Project {
-  // TODO: id 为number
-  id: string;
+  id: number;
   name: string;
-  personId: string;
+  personId: number;
   pin: boolean;
   organization: string;
   created: number;

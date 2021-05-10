@@ -10,15 +10,18 @@ import {
 } from "hooks";
 import styled from "@emotion/styled";
 import { Typography } from "antd";
-// import { Helmet } from "react-helmet";
+import { useProjectsSearchParam } from "./util";
 
+/**
+ *  基本类型, 组件的状态 可以放在依赖里, 非组件状态对象, 绝不能放在组件依赖里
+ * @returns
+ */
 export const ProjectList = () => {
-  const [param, setParam] = useUrlQueryParam(["name", "personId"]);
-  const debouncedParam = useDebounce(param, 200);
-  const { isLoading, error, data: list } = useProjects(debouncedParam);
-  const { data: users } = useUsers();
-
   useDocumentTitle("项目列表", false);
+
+  const [param, setParam] = useProjectsSearchParam();
+  const { isLoading, error, data: list } = useProjects(useDebounce(param, 200));
+  const { data: users } = useUsers();
 
   return (
     <Container>
