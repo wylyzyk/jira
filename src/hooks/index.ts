@@ -4,6 +4,40 @@ import { URLSearchParamsInit, useSearchParams } from "react-router-dom";
 import { Project, Users } from "typing";
 import { cleanObject } from "utils";
 
+export const useEditProject = () => {
+  const { run, ...asyncResult } = useAsync();
+  const client = useHttp();
+  const mutate = (params: Partial<Project>) => {
+    return run(
+      client(`projects/${params.id}`, {
+        data: params,
+        method: "PATCH",
+      })
+    );
+  };
+  return {
+    mutate,
+    ...asyncResult,
+  };
+};
+
+export const useAddProject = () => {
+  const { run, ...asyncResult } = useAsync();
+  const client = useHttp();
+  const mutate = (params: Partial<Project>) => {
+    return run(
+      client(`projects/${params.id}`, {
+        data: params,
+        method: "POST",
+      })
+    );
+  };
+  return {
+    mutate,
+    ...asyncResult,
+  };
+};
+
 export const useUrlQueryParam = <T extends string>(keys: T[]) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -91,6 +125,7 @@ export const useAsync = <U>(
   });
 
   const config = { ...defaultConfig, ...initialConfig };
+  const [retry, setRetry] = useState(() => () => {});
 
   function setData(data: U) {
     return setState({
@@ -109,11 +144,15 @@ export const useAsync = <U>(
   }
 
   // 用来触发异步请求
-  function run(promise: Promise<U>) {
+  function run(promise: Promise<U>, runConfig?: { retry: () => Promise<U> }) {
     if (!promise || !promise.then) {
       throw new Error("请传入Promise类型数据");
     }
-
+    setRetry(() => () => {
+      if (runConfig?.retry) {
+        run(runConfig?.retry(), runConfig);
+      }
+    });
     setState({ ...state, stat: "loading" });
 
     return (
@@ -137,6 +176,8 @@ export const useAsync = <U>(
     isError: state.stat === "error",
     isSuccess: state.stat === "success",
     run,
+    // retry 被调用时, 再次调用 run 刷新页面
+    retry,
     setData,
     setError,
     ...state,
@@ -147,8 +188,13 @@ export const useProjects = (param?: Partial<Project>) => {
   const client = useHttp();
   const { run, ...result } = useAsync<Project[]>();
 
+  const fetchProject = () =>
+    client("projects", { data: cleanObject(param || {}) });
+
   useEffect(() => {
-    run(client("projects", { data: cleanObject(param || {}) }));
+    run(fetchProject(), {
+      retry: fetchProject,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [param]);
 

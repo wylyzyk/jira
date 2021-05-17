@@ -1,13 +1,7 @@
 import React from "react";
 import List from "./List";
 import Search from "./Search";
-import {
-  useDebounce,
-  useProjects,
-  useUsers,
-  useDocumentTitle,
-  useUrlQueryParam,
-} from "hooks";
+import { useDebounce, useProjects, useUsers, useDocumentTitle } from "hooks";
 import styled from "@emotion/styled";
 import { Typography } from "antd";
 import { useProjectsSearchParam } from "./util";
@@ -20,7 +14,9 @@ export const ProjectList = () => {
   useDocumentTitle("项目列表", false);
 
   const [param, setParam] = useProjectsSearchParam();
-  const { isLoading, error, data: list } = useProjects(useDebounce(param, 200));
+  const { isLoading, error, data: list, retry } = useProjects(
+    useDebounce(param, 200)
+  );
   const { data: users } = useUsers();
 
   return (
@@ -30,7 +26,12 @@ export const ProjectList = () => {
       {error ? (
         <Typography.Text type="danger">{error.message}</Typography.Text>
       ) : null}
-      <List dataSource={list || []} users={users || []} loading={isLoading} />
+      <List
+        dataSource={list || []}
+        users={users || []}
+        loading={isLoading}
+        refresh={retry}
+      />
     </Container>
   );
 };

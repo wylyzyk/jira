@@ -52,7 +52,6 @@ export const http = async (
 export const useHttp = () => {
   const { user } = useAuth();
 
-  // TODO: Parameters<T> 操作符了解
   // 使用rest操作符, 将 tuple 中的值结构出来
   return (...[endpoint, config]: Parameters<typeof http>) =>
     http(endpoint, { ...config, token: user?.token });
