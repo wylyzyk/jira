@@ -126,6 +126,7 @@ export const useAsync = <U>(
 
   const config = { ...defaultConfig, ...initialConfig };
   const [retry, setRetry] = useState(() => () => {});
+  const mountedRef = useMountedRef();
 
   function setData(data: U) {
     return setState({
@@ -158,7 +159,9 @@ export const useAsync = <U>(
     return (
       promise
         .then((data) => {
-          setData(data);
+          if (mountedRef.current) {
+            setData(data);
+          }
           return data;
         })
         // catch 将捕获到的异常会消化, 其他函数调用不会再 catch 到异常, 所以不能值返回 err , 要返回 Promise.reject()
@@ -182,6 +185,23 @@ export const useAsync = <U>(
     setError,
     ...state,
   };
+};
+
+/**
+ * 返回组件的挂载状态, 如果还没有 挂载或已经卸载 ,返回false, 反之, 返回true
+ * @returns
+ */
+export const useMountedRef = () => {
+  const mountedRef = useRef(false);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  });
+
+  return mountedRef;
 };
 
 export const useProjects = (param?: Partial<Project>) => {
