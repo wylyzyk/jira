@@ -15,9 +15,9 @@ import PopOver from "components/PopOver";
 const Authenticated = () => {
   return (
     <Container>
-      <PageHeader />
-      <Main>
-        <Router>
+      <Router>
+        <PageHeader />
+        <Main>
           <Routes>
             <Route path={"/projects"} element={<ProjectList />}></Route>
             <Route
@@ -26,9 +26,9 @@ const Authenticated = () => {
             ></Route>
             <Navigate to="/projects" />
           </Routes>
-        </Router>
-      </Main>
-      <Model />
+        </Main>
+        <Model />
+      </Router>
     </Container>
   );
 };

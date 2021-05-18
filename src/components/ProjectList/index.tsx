@@ -1,7 +1,13 @@
 import React from "react";
 import List from "./List";
 import Search from "./Search";
-import { useDebounce, useProjects, useUsers, useDocumentTitle } from "hooks";
+import {
+  useDebounce,
+  useProjects,
+  useUsers,
+  useDocumentTitle,
+  useProjectModel,
+} from "hooks";
 import styled from "@emotion/styled";
 import { Typography } from "antd";
 import { useProjectsSearchParam } from "./util";
@@ -20,13 +26,15 @@ export const ProjectList = () => {
     useDebounce(param, 200)
   );
   const { data: users } = useUsers();
+  const { open } = useProjectModel();
 
   return (
     <Container>
-      <h2>项目列表</h2>
       <Row between={true}>
         <h2>项目列表</h2>
-        <ButtonNoPadding type="link">创建项目</ButtonNoPadding>
+        <ButtonNoPadding type="link" onClick={open}>
+          创建项目
+        </ButtonNoPadding>
       </Row>
       <Search users={users || []} param={param} setParam={setParam} />
       {error ? (

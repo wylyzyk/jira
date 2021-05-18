@@ -2,7 +2,7 @@ import { Dropdown, Menu, Table, TableProps } from "antd";
 import ButtonNoPadding from "components/lib/Button";
 import Pin from "components/lib/Pin";
 import dayjs from "dayjs";
-import { useEditProject } from "hooks";
+import { useEditProject, useProjectModel } from "hooks";
 import React, { FC } from "react";
 import { Link } from "react-router-dom";
 import { Project, Users } from "../../typing";
@@ -17,6 +17,7 @@ const List: FC<IProps> = ({ users, refresh, ...props }) => {
   // 函数柯里化 point free
   const pinProject = (id: number) => (pin: boolean) =>
     mutate({ id, pin }).then(refresh);
+  const { open } = useProjectModel();
 
   return (
     <Table
@@ -77,7 +78,9 @@ const List: FC<IProps> = ({ users, refresh, ...props }) => {
                 overlay={
                   <Menu>
                     <Menu.Item key="edit">
-                      <ButtonNoPadding type="link">编辑</ButtonNoPadding>
+                      <ButtonNoPadding type="link" onClick={open}>
+                        编辑
+                      </ButtonNoPadding>
                     </Menu.Item>
                   </Menu>
                 }

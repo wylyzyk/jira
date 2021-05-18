@@ -10,7 +10,7 @@ export const useProjectModel = () => {
   ]);
 
   const open = () => setProjectCreate({ projectCreate: true });
-  const close = () => setProjectCreate({ projectCreate: false });
+  const close = () => setProjectCreate({ projectCreate: undefined });
 
   return { projectModelOpen: projectCreate === "true", open, close };
 };
