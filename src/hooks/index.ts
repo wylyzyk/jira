@@ -4,6 +4,17 @@ import { URLSearchParamsInit, useSearchParams } from "react-router-dom";
 import { Project, Users } from "typing";
 import { cleanObject } from "utils";
 
+export const useProjectModel = () => {
+  const [{ projectCreate }, setProjectCreate] = useUrlQueryParam([
+    "projectCreate",
+  ]);
+
+  const open = () => setProjectCreate({ projectCreate: true });
+  const close = () => setProjectCreate({ projectCreate: false });
+
+  return { projectModelOpen: projectCreate === "true", open, close };
+};
+
 export const useEditProject = () => {
   const { run, ...asyncResult } = useAsync();
   const client = useHttp();
