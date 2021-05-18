@@ -1,5 +1,6 @@
 import { useAuth } from "context/auth-context";
 import qs from "qs";
+import { useCallback } from "react";
 import * as auth from "../auth-provider";
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -53,6 +54,9 @@ export const useHttp = () => {
   const { user } = useAuth();
 
   // 使用rest操作符, 将 tuple 中的值结构出来
-  return (...[endpoint, config]: Parameters<typeof http>) =>
-    http(endpoint, { ...config, token: user?.token });
+  return useCallback(
+    (...[endpoint, config]: Parameters<typeof http>) =>
+      http(endpoint, { ...config, token: user?.token }),
+    [user?.token]
+  );
 };

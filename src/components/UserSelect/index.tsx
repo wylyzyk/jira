@@ -1,4 +1,4 @@
-import IdSelect from "components/IdSelect";
+import IdSelect from "components/lib/IdSelect";
 import { useUsers } from "hooks";
 import React from "react";
 

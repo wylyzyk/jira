@@ -3,8 +3,8 @@ import Authenticated from "components/authenticated";
 import Unauthenticated from "components/unauthenticated";
 import { useAuth } from "context/auth-context";
 import "./App.css";
-import ErrorBoundary from "components/ErrorBoundary";
-import { FullPageErrorFallback } from "components/FullPageLoading";
+import ErrorBoundary from "./components/lib/ErrorBoundary";
+import { FullPageErrorFallback } from "components/lib/FullPageLoading";
 
 function App() {
   const { user } = useAuth();

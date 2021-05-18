@@ -1,5 +1,12 @@
 import { useHttp } from "network/http";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { URLSearchParamsInit, useSearchParams } from "react-router-dom";
 import { Project, Users } from "typing";
 import { cleanObject } from "utils";
@@ -115,63 +122,83 @@ const defaultConfig = {
   throwOnError: false,
 };
 
+const useSafeDispatch = <T>(dispatch: (...args: T[]) => void) => {
+  const mountedRef = useMountedRef();
+  return useCallback(
+    (...args: T[]) => (mountedRef.current ? dispatch(...args) : void 0),
+    [mountedRef, dispatch]
+  );
+};
+
 export const useAsync = <U>(
   initialState?: IState<U>,
   initialConfig?: typeof defaultConfig
 ) => {
-  const [state, setState] = useState<IState<U>>({
-    ...defaultInitialState,
-    ...initialState,
-  });
+  const [state, dispatch] = useReducer(
+    (state: IState<U>, action: Partial<IState<U>>) => ({ ...state, ...action }),
+    {
+      ...defaultInitialState,
+      ...initialState,
+    }
+  );
 
   const config = { ...defaultConfig, ...initialConfig };
   const [retry, setRetry] = useState(() => () => {});
-  const mountedRef = useMountedRef();
+  const safeDispatch = useSafeDispatch(dispatch);
 
-  function setData(data: U) {
-    return setState({
-      data,
-      stat: "success",
-      error: null,
-    });
-  }
+  const setData = useCallback(
+    (data: U) => {
+      return safeDispatch({
+        data,
+        stat: "success",
+        error: null,
+      });
+    },
+    [safeDispatch]
+  );
 
-  function setError(error: Error) {
-    return setState({
-      error,
-      stat: "error",
-      data: null,
-    });
-  }
+  const setError = useCallback(
+    (error: Error) => {
+      return safeDispatch({
+        error,
+        stat: "error",
+        data: null,
+      });
+    },
+    [safeDispatch]
+  );
 
   // 用来触发异步请求
-  function run(promise: Promise<U>, runConfig?: { retry: () => Promise<U> }) {
-    if (!promise || !promise.then) {
-      throw new Error("请传入Promise类型数据");
-    }
-    setRetry(() => () => {
-      if (runConfig?.retry) {
-        run(runConfig?.retry(), runConfig);
+  const run = useCallback(
+    (promise: Promise<U>, runConfig?: { retry: () => Promise<U> }) => {
+      if (!promise || !promise.then) {
+        throw new Error("请传入Promise类型数据");
       }
-    });
-    setState({ ...state, stat: "loading" });
+      setRetry(() => () => {
+        if (runConfig?.retry) {
+          run(runConfig?.retry(), runConfig);
+        }
+      });
+      // 直接使用state() 会导致页面无限渲染, 避免直接使用state, 使用setState的第二种用法, 此时也不用依赖state
+      // setState((preState) => ({ ...preState, stat: "loading" }));
+      safeDispatch({ stat: "loading" });
 
-    return (
-      promise
-        .then((data) => {
-          if (mountedRef.current) {
+      return (
+        promise
+          .then((data) => {
             setData(data);
-          }
-          return data;
-        })
-        // catch 将捕获到的异常会消化, 其他函数调用不会再 catch 到异常, 所以不能值返回 err , 要返回 Promise.reject()
-        .catch((err) => {
-          setError(err);
-          if (config.throwOnError) return Promise.reject(err);
-          return err;
-        })
-    );
-  }
+            return data;
+          })
+          // catch 将捕获到的异常会消化, 其他函数调用不会再 catch 到异常, 所以不能值返回 err , 要返回 Promise.reject()
+          .catch((err) => {
+            setError(err);
+            if (config.throwOnError) return Promise.reject(err);
+            return err;
+          })
+      );
+    },
+    [config.throwOnError, setData, setError, safeDispatch]
+  );
 
   return {
     isIdle: state.stat === "idle",
@@ -208,15 +235,16 @@ export const useProjects = (param?: Partial<Project>) => {
   const client = useHttp();
   const { run, ...result } = useAsync<Project[]>();
 
-  const fetchProject = () =>
-    client("projects", { data: cleanObject(param || {}) });
+  const fetchProject = useCallback(
+    () => client("projects", { data: cleanObject(param || {}) }),
+    [param, client]
+  );
 
   useEffect(() => {
     run(fetchProject(), {
       retry: fetchProject,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [param]);
+  }, [param, run, fetchProject]);
 
   return result;
 };
@@ -227,8 +255,7 @@ export const useUsers = (param?: Partial<Users>) => {
 
   useEffect(() => {
     run(client("users", { data: cleanObject(param || {}) }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [param]);
+  }, [param, run, client]);
 
   return result;
 };
