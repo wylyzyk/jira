@@ -8,6 +8,9 @@ import { Row } from "components/style/lib";
 import { Button, Dropdown, Menu } from "antd";
 import ProjectItem from "components/ProjectItem";
 import { resetRouter } from "utils";
+import Model from "components/ProjectList/Model";
+import ButtonNoPadding from "components/lib/Button";
+import PopOver from "components/PopOver";
 
 const Authenticated = () => {
   return (
@@ -25,37 +28,44 @@ const Authenticated = () => {
           </Routes>
         </Router>
       </Main>
+      <Model />
     </Container>
   );
 };
 
 const PageHeader = () => {
-  const { logout, user } = useAuth();
   return (
     <Header between={true}>
       <HeaderLeft gap={true}>
-        <Button type="link" onClick={resetRouter}>
+        <ButtonNoPadding type="link" onClick={resetRouter}>
           <h1>Welcome Jira!</h1>
-        </Button>
-        <h3>项目</h3>
+        </ButtonNoPadding>
+        <PopOver />
         <h3>用户</h3>
       </HeaderLeft>
       <HeaderRight>
-        <Dropdown
-          overlay={
-            <Menu>
-              <Menu.Item>
-                <Button type="link">登出</Button>
-              </Menu.Item>
-            </Menu>
-          }
-        >
-          <Button type="link" onClick={logout}>
-            Hi, {user?.name}
-          </Button>
-        </Dropdown>
+        <User />
       </HeaderRight>
     </Header>
+  );
+};
+
+const User = () => {
+  const { logout, user } = useAuth();
+  return (
+    <Dropdown
+      overlay={
+        <Menu>
+          <Menu.Item>
+            <Button type="link">登出</Button>
+          </Menu.Item>
+        </Menu>
+      }
+    >
+      <Button type="link" onClick={logout}>
+        Hi, {user?.name}
+      </Button>
+    </Dropdown>
   );
 };
 

@@ -1,6 +1,6 @@
 // import { jsx } from "@emotion/react";
 import React, { FC } from "react";
-import { Form, Input, Select } from "antd";
+import { Form, Input } from "antd";
 import { Project, Users } from "../../typing";
 import UserSelect from "components/UserSelect";
 

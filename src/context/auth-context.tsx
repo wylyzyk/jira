@@ -6,7 +6,7 @@ import { useAsync, useMount } from "hooks";
 import {
   FullPageLoading,
   FullPageErrorFallback,
-} from "components/FullPageLoading";
+} from "components/lib/FullPageLoading";
 
 interface IProps {
   user: Users | null;

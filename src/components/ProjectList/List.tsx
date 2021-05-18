@@ -1,5 +1,6 @@
-import { Table, TableProps } from "antd";
-import Pin from "components/Pin";
+import { Dropdown, Menu, Table, TableProps } from "antd";
+import ButtonNoPadding from "components/lib/Button";
+import Pin from "components/lib/Pin";
 import dayjs from "dayjs";
 import { useEditProject } from "hooks";
 import React, { FC } from "react";
@@ -66,6 +67,23 @@ const List: FC<IProps> = ({ users, refresh, ...props }) => {
                   ? dayjs(project.created).format("YYYY-MM-DD")
                   : "无"}
               </span>
+            );
+          },
+        },
+        {
+          render(value, project) {
+            return (
+              <Dropdown
+                overlay={
+                  <Menu>
+                    <Menu.Item key="edit">
+                      <ButtonNoPadding type="link">编辑</ButtonNoPadding>
+                    </Menu.Item>
+                  </Menu>
+                }
+              >
+                <ButtonNoPadding type="link">...</ButtonNoPadding>
+              </Dropdown>
             );
           },
         },

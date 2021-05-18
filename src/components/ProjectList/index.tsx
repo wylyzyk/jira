@@ -5,6 +5,8 @@ import { useDebounce, useProjects, useUsers, useDocumentTitle } from "hooks";
 import styled from "@emotion/styled";
 import { Typography } from "antd";
 import { useProjectsSearchParam } from "./util";
+import { Row } from "components/style/lib";
+import ButtonNoPadding from "components/lib/Button";
 
 /**
  *  基本类型, 组件的状态 可以放在依赖里, 非组件状态对象, 绝不能放在组件依赖里
@@ -22,6 +24,10 @@ export const ProjectList = () => {
   return (
     <Container>
       <h2>项目列表</h2>
+      <Row between={true}>
+        <h2>项目列表</h2>
+        <ButtonNoPadding type="link">创建项目</ButtonNoPadding>
+      </Row>
       <Search users={users || []} param={param} setParam={setParam} />
       {error ? (
         <Typography.Text type="danger">{error.message}</Typography.Text>
