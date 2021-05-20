@@ -17,15 +17,13 @@ export const useProjectModel = () => {
   const [{ editingProjectId }, setEditingProjectId] = useUrlQueryParam([
     "editingProjectId",
   ]);
+  const setUrlParams = useSetUrlSearchParam();
   const { data: editingProject, isLoading } = useProject(
     Number(editingProjectId)
   );
 
   const open = () => setProjectCreate({ projectCreate: true });
-  const close = () => {
-    setProjectCreate({ projectCreate: undefined });
-    setEditingProjectId({ editingProjectId: undefined });
-  };
+  const close = () => setUrlParams({ projectCreate: "", editingProjectId: "" });
 
   const startEdit = (id: number) =>
     setEditingProjectId({ editingProjectId: id });
@@ -40,6 +38,7 @@ export const useProjectModel = () => {
   };
 };
 
+// TODO: 不能成功编辑项目
 export const useEditProject = (queryKey: QueryKey) => {
   const client = useHttp();
 
@@ -73,6 +72,7 @@ export const useEditProject = (queryKey: QueryKey) => {
   //#endregion
 };
 
+// TODO: 添加项目: 未完成, 且Drawer 不能正常给退出
 export const useAddProject = (queryKey: QueryKey) => {
   const client = useHttp();
 
@@ -86,6 +86,7 @@ export const useAddProject = (queryKey: QueryKey) => {
   );
 };
 
+// TODO: 未知问题, 未实现
 export const useDeleteProject = (queryKey: QueryKey) => {
   const client = useHttp();
 
@@ -107,23 +108,38 @@ export const useProject = (id?: number) => {
 };
 
 export const useUrlQueryParam = <T extends string>(keys: T[]) => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
+  const setSearchParams = useSetUrlSearchParam();
+  const [stateKeys] = useState(keys);
 
   return [
     useMemo(() => {
       return keys.reduce((prev, key) => {
         return { ...prev, [key]: searchParams.get(key) || "" };
       }, {} as { [key in T]: string });
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+
+      // return subset(Object.fromEntries(searchParams), stateKeys) as {[key in T]: string}
     }, [searchParams]),
     (params: Partial<{ [key in T]: unknown }>) => {
-      const o = cleanObject({
-        ...Object.fromEntries(searchParams),
-        ...params,
-      }) as URLSearchParamsInit;
-      return setSearchParams(o);
+      // const o = cleanObject({
+      //   ...Object.fromEntries(searchParams),
+      //   ...params,
+      // }) as URLSearchParamsInit;
+      return setSearchParams(params);
     },
   ] as const;
+};
+
+export const useSetUrlSearchParam = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  return (params: { [key in string]: unknown }) => {
+    const o = cleanObject({
+      ...Object.fromEntries(searchParams),
+      ...params,
+    }) as URLSearchParamsInit;
+    return setSearchParams(o);
+  };
 };
 
 export const useDocumentTitle = (title: string, keepOnUnmount = true) => {

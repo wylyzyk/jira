@@ -1,3 +1,5 @@
+//乐观更新
+
 import { QueryKey, useQueryClient } from "react-query";
 
 export const useConfig = (
