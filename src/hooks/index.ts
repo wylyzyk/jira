@@ -1,9 +1,14 @@
 import { useHttp } from "network/http";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { QueryKey, useMutation, useQuery } from "react-query";
 import { URLSearchParamsInit, useSearchParams } from "react-router-dom";
 import { Project, Users } from "typing";
 import { cleanObject } from "utils";
+import {
+  useAddConfig,
+  useDeleteConfig,
+  useEditConfig,
+} from "./use-optimistic-options";
 
 export const useProjectModel = () => {
   const [{ projectCreate }, setProjectCreate] = useUrlQueryParam([
@@ -35,9 +40,8 @@ export const useProjectModel = () => {
   };
 };
 
-export const useEditProject = () => {
+export const useEditProject = (queryKey: QueryKey) => {
   const client = useHttp();
-  const queryClient = useQueryClient();
 
   return useMutation(
     (params: Partial<Project>) =>
@@ -45,9 +49,9 @@ export const useEditProject = () => {
         method: "PATCH",
         data: params,
       }),
-    {
-      onSuccess: () => queryClient.invalidateQueries("projects"),
-    }
+
+    // 解耦 和 List 页面耦合度太高
+    useEditConfig(queryKey)
   );
 
   //#region
@@ -69,38 +73,26 @@ export const useEditProject = () => {
   //#endregion
 };
 
-export const useAddProject = () => {
+export const useAddProject = (queryKey: QueryKey) => {
   const client = useHttp();
-  const queryClient = useQueryClient();
 
   return useMutation(
     (params: Partial<Project>) =>
       client(`projects`, {
-        method: "POST",
         data: params,
+        method: "POST",
       }),
-    {
-      onSuccess: () => queryClient.invalidateQueries("projects"),
-    }
+    useAddConfig(queryKey)
   );
+};
 
-  //#region
-  /*
-  const { run, ...asyncResult } = useAsync();
-  const mutate = (params: Partial<Project>) => {
-    return run(
-      client(`projects/${params.id}`, {
-        data: params,
-        method: "POST",
-      })
-    );
-  };
-  return {
-    mutate,
-    ...asyncResult,
-  };
-  */
-  //#endregion
+export const useDeleteProject = (queryKey: QueryKey) => {
+  const client = useHttp();
+
+  return useMutation(
+    (id: { id: number }) => client(`projects/${id}`, { method: "DELETE" }),
+    useDeleteConfig(queryKey)
+  );
 };
 
 export const useProject = (id?: number) => {

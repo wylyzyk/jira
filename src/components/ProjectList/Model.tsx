@@ -5,6 +5,7 @@ import { ErrorBox } from "components/lib/FullPageLoading";
 import UserSelect from "components/UserSelect";
 import { useAddProject, useEditProject, useProjectModel } from "hooks";
 import React, { FC, useEffect } from "react";
+import { useProjectQueryKey } from "./util";
 
 const Model: FC = () => {
   const {
@@ -17,7 +18,9 @@ const Model: FC = () => {
 
   const title = editingProject ? "编辑项目" : "创建项目";
 
-  const { mutateAsync, error, isLoading: mutateLoading } = useMutateProject();
+  const { mutateAsync, error, isLoading: mutateLoading } = useMutateProject(
+    useProjectQueryKey()
+  );
   const [form] = useForm();
   const onFinish = (values: any) => {
     mutateAsync({ ...editingProject, ...values }).then(() => {
