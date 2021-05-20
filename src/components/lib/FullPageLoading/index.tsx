@@ -15,9 +15,22 @@ const FullPageErrorFallback = ({ error }: { error: Error | null }) => {
   return (
     <FullPage>
       <DevTools />
+      <ErrorBox error={error} />
       <Typography.Text type="danger">{error?.message}</Typography.Text>
     </FullPage>
   );
+};
+
+// 类型守卫
+// 如果 value.message 存在, 返回true , value 的类型就是Error
+const isError = (value: any): value is Error => value?.message;
+
+export const ErrorBox = ({ error }: { error: unknown }) => {
+  if (isError(error)) {
+    return <Typography.Text>{error?.message}</Typography.Text>;
+  }
+
+  return null;
 };
 
 const FullPage = styled.div`

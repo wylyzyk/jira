@@ -9,15 +9,14 @@ import { Project, Users } from "../../typing";
 
 interface IProps extends TableProps<Project> {
   users: Users[];
-  refresh?: () => void;
 }
 
-const List: FC<IProps> = ({ users, refresh, ...props }) => {
+const List: FC<IProps> = ({ users, ...props }) => {
   const { mutate } = useEditProject();
+  const { startEdit } = useProjectModel();
   // 函数柯里化 point free
-  const pinProject = (id: number) => (pin: boolean) =>
-    mutate({ id, pin }).then(refresh);
-  const { open } = useProjectModel();
+  const pinProject = (id: number) => (pin: boolean) => mutate({ id, pin });
+  const editProject = (id: number) => () => startEdit(id);
 
   return (
     <Table
@@ -27,7 +26,6 @@ const List: FC<IProps> = ({ users, refresh, ...props }) => {
         {
           title: <Pin checked={true} disabled={true} />,
           render(value, project) {
-            console.log(project);
             return (
               <Pin
                 checked={project.pin}
@@ -77,11 +75,10 @@ const List: FC<IProps> = ({ users, refresh, ...props }) => {
               <Dropdown
                 overlay={
                   <Menu>
-                    <Menu.Item key="edit">
-                      <ButtonNoPadding type="link" onClick={open}>
-                        编辑
-                      </ButtonNoPadding>
+                    <Menu.Item key="edit" onClick={editProject(project.id)}>
+                      编辑
                     </Menu.Item>
+                    <Menu.Item key="delete">删除</Menu.Item>
                   </Menu>
                 }
               >

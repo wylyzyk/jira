@@ -1,5 +1,6 @@
 import { useHttp } from "network/http";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { URLSearchParamsInit, useSearchParams } from "react-router-dom";
 import { Project, Users } from "typing";
 import { cleanObject } from "utils";
@@ -8,16 +9,50 @@ export const useProjectModel = () => {
   const [{ projectCreate }, setProjectCreate] = useUrlQueryParam([
     "projectCreate",
   ]);
+  const [{ editingProjectId }, setEditingProjectId] = useUrlQueryParam([
+    "editingProjectId",
+  ]);
+  const { data: editingProject, isLoading } = useProject(
+    Number(editingProjectId)
+  );
 
   const open = () => setProjectCreate({ projectCreate: true });
-  const close = () => setProjectCreate({ projectCreate: undefined });
+  const close = () => {
+    setProjectCreate({ projectCreate: undefined });
+    setEditingProjectId({ editingProjectId: undefined });
+  };
 
-  return { projectModelOpen: projectCreate === "true", open, close };
+  const startEdit = (id: number) =>
+    setEditingProjectId({ editingProjectId: id });
+
+  return {
+    projectModelOpen: projectCreate === "true" || Boolean(editingProjectId),
+    open,
+    close,
+    startEdit,
+    editingProject,
+    isLoading,
+  };
 };
 
 export const useEditProject = () => {
-  const { run, ...asyncResult } = useAsync();
   const client = useHttp();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    (params: Partial<Project>) =>
+      client(`projects/${params.id}`, {
+        method: "PATCH",
+        data: params,
+      }),
+    {
+      onSuccess: () => queryClient.invalidateQueries("projects"),
+    }
+  );
+
+  //#region
+  /*   
+  const { run, ...asyncResult } = useAsync();
   const mutate = (params: Partial<Project>) => {
     return run(
       client(`projects/${params.id}`, {
@@ -29,12 +64,29 @@ export const useEditProject = () => {
   return {
     mutate,
     ...asyncResult,
-  };
+  }; 
+  */
+  //#endregion
 };
 
 export const useAddProject = () => {
-  const { run, ...asyncResult } = useAsync();
   const client = useHttp();
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    (params: Partial<Project>) =>
+      client(`projects`, {
+        method: "POST",
+        data: params,
+      }),
+    {
+      onSuccess: () => queryClient.invalidateQueries("projects"),
+    }
+  );
+
+  //#region
+  /*
+  const { run, ...asyncResult } = useAsync();
   const mutate = (params: Partial<Project>) => {
     return run(
       client(`projects/${params.id}`, {
@@ -47,6 +99,19 @@ export const useAddProject = () => {
     mutate,
     ...asyncResult,
   };
+  */
+  //#endregion
+};
+
+export const useProject = (id?: number) => {
+  const client = useHttp();
+
+  return useQuery<Project>(
+    ["project", { id }],
+    () => client(`projects/${id}`),
+    // id 如果为undefined 不再重新请求
+    { enabled: !!id }
+  );
 };
 
 export const useUrlQueryParam = <T extends string>(keys: T[]) => {
@@ -217,6 +282,13 @@ export const useMountedRef = () => {
 
 export const useProjects = (param?: Partial<Project>) => {
   const client = useHttp();
+
+  // useQuery 第一个参数 数组中的值发生变化时, 请求会重新触发
+  return useQuery<Project[]>(["projects", param], () =>
+    client("projects", { data: param })
+  );
+  //#region
+  /*
   const { run, ...result } = useAsync<Project[]>();
 
   const fetchProject = () =>
@@ -230,6 +302,8 @@ export const useProjects = (param?: Partial<Project>) => {
   }, [param]);
 
   return result;
+  */
+  //#endregion
 };
 
 export const useUsers = (param?: Partial<Users>) => {

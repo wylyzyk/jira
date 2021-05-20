@@ -13,6 +13,7 @@ import { Typography } from "antd";
 import { useProjectsSearchParam } from "./util";
 import { Row } from "components/style/lib";
 import ButtonNoPadding from "components/lib/Button";
+import { ErrorBox } from "components/lib/FullPageLoading";
 
 /**
  *  基本类型, 组件的状态 可以放在依赖里, 非组件状态对象, 绝不能放在组件依赖里
@@ -22,9 +23,7 @@ export const ProjectList = () => {
   useDocumentTitle("项目列表", false);
 
   const [param, setParam] = useProjectsSearchParam();
-  const { isLoading, error, data: list, retry } = useProjects(
-    useDebounce(param, 200)
-  );
+  const { isLoading, error, data: list } = useProjects(useDebounce(param, 200));
   const { data: users } = useUsers();
   const { open } = useProjectModel();
 
@@ -37,15 +36,8 @@ export const ProjectList = () => {
         </ButtonNoPadding>
       </Row>
       <Search users={users || []} param={param} setParam={setParam} />
-      {error ? (
-        <Typography.Text type="danger">{error.message}</Typography.Text>
-      ) : null}
-      <List
-        dataSource={list || []}
-        users={users || []}
-        loading={isLoading}
-        refresh={retry}
-      />
+      <ErrorBox error={error} />
+      <List dataSource={list || []} users={users || []} loading={isLoading} />
     </Container>
   );
 };

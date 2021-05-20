@@ -3,6 +3,7 @@ import { Button, Card, Divider, Typography } from "antd";
 import Login from "./Login";
 import Register from "./Register";
 import styled from "@emotion/styled";
+import { ErrorBox } from "components/lib/FullPageLoading";
 // import { Helmet } from "react-helmet";
 
 const Unauthenticated = () => {
@@ -14,9 +15,7 @@ const Unauthenticated = () => {
       <ShadowCard>
         <Title>{isRegister ? "Sign up" : "Sign in"}</Title>
         {""}
-        {error ? (
-          <Typography.Text type="danger">{error.message}</Typography.Text>
-        ) : null}
+        <ErrorBox error={error} />
         {""}
         {isRegister ? (
           <Register onError={setError} />
