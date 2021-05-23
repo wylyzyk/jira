@@ -9,7 +9,6 @@ import {
   useProjectModel,
 } from "hooks";
 import styled from "@emotion/styled";
-import { Typography } from "antd";
 import { useProjectsSearchParam } from "./util";
 import { Row } from "components/style/lib";
 import ButtonNoPadding from "components/lib/Button";

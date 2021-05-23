@@ -6,7 +6,7 @@ import React from "react";
 
 const PopOver = () => {
   const { open } = useProjectModel();
-  const { data: projects, isLoading } = useProjects();
+  const { data: projects } = useProjects();
   const pinnedProjects = projects?.filter((project) => project.pin);
 
   const content = (

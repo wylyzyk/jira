@@ -110,7 +110,6 @@ export const useProject = (id?: number) => {
 export const useUrlQueryParam = <T extends string>(keys: T[]) => {
   const [searchParams] = useSearchParams();
   const setSearchParams = useSetUrlSearchParam();
-  const [stateKeys] = useState(keys);
 
   return [
     useMemo(() => {
@@ -119,7 +118,7 @@ export const useUrlQueryParam = <T extends string>(keys: T[]) => {
       }, {} as { [key in T]: string });
 
       // return subset(Object.fromEntries(searchParams), stateKeys) as {[key in T]: string}
-    }, [searchParams]),
+    }, [searchParams, keys]),
     (params: Partial<{ [key in T]: unknown }>) => {
       // const o = cleanObject({
       //   ...Object.fromEntries(searchParams),

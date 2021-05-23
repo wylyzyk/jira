@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Card, Divider, Typography } from "antd";
+import { Button, Card, Divider } from "antd";
 import Login from "./Login";
 import Register from "./Register";
 import styled from "@emotion/styled";

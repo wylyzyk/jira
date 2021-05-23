@@ -13,7 +13,8 @@ const ProjectItem = () => {
       <Routes>
         <Route path="/kanban" element={<KanBan />} />
         <Route path="/epic" element={<Epic />} />
-        <Navigate to={window.location.pathname + "/kanban"} />
+        {/* replace ={true} 如果路由当前路由不匹配, 会将重定向的路由替换当前路由, 而不是简单的push */}
+        <Navigate to={window.location.pathname + "/kanban"} replace={true} />
       </Routes>
     </div>
   );

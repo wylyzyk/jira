@@ -29,6 +29,11 @@ const Model: FC = () => {
     });
   };
 
+  const closeModal = () => {
+    form.resetFields();
+    close();
+  };
+
   useEffect(() => {
     form.setFieldsValue(editingProject);
   }, [editingProject, form]);
@@ -37,7 +42,7 @@ const Model: FC = () => {
     <Drawer
       width="100%"
       forceRender={true}
-      onClose={close}
+      onClose={closeModal}
       visible={projectModelOpen}
     >
       <Container>

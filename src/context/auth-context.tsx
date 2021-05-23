@@ -7,6 +7,7 @@ import {
   FullPageLoading,
   FullPageErrorFallback,
 } from "components/lib/FullPageLoading";
+import { useQueryClient } from "react-query";
 
 interface IProps {
   user: Users | null;
@@ -41,11 +42,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setData: setUser,
   } = useAsync<Users | null>();
 
+  const queryClient = useQueryClient();
+
   const login = (form: AuthForm) => auth.login(form).then(setUser);
 
   const register = (form: AuthForm) => auth.register(form).then(setUser);
 
-  const logout = () => auth.logout().then(() => setUser(null));
+  const logout = () =>
+    auth.logout().then(() => {
+      setUser(null);
+      // 退出登录 清空缓存
+      queryClient.clear();
+    });
 
   useMount(() => run(bootsUser()));
 
