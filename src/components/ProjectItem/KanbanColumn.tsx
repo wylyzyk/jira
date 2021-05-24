@@ -1,10 +1,11 @@
 import styled from "@emotion/styled";
 import { Button, Card, Dropdown, Menu, Modal } from "antd";
+import { Drag, Drop, DropChild } from "components/drag-and-drop";
 import { Row } from "components/style/lib";
 import { useDeleteKanban } from "hooks/kanban";
 import { useTasks } from "hooks/task";
 import { useTaskTypes } from "hooks/task-type";
-import React from "react";
+import React, { forwardRef } from "react";
 import { Kanban, Task } from "typing";
 import { CreateTask } from "./CreateTask";
 import Mark from "./mark";
@@ -40,25 +41,44 @@ const TaskCard = ({ task }: { task: Task }) => {
   );
 };
 
-const KanbanColumn = ({ kanban }: { kanban: Kanban }) => {
-  const { data: allTasks } = useTasks(useTaskSearchParams());
-  const tasks = allTasks?.filter((task) => task.projectId === kanban.id);
+const KanbanColumn = forwardRef<HTMLDivElement, { kanban: Kanban }>(
+  ({ kanban, ...props }, ref) => {
+    const { data: allTasks } = useTasks(useTaskSearchParams());
+    const tasks = allTasks?.filter((task) => task.projectId === kanban.id);
 
-  return (
-    <Container>
-      <Row between={true}>
-        <h3>{kanban.name}</h3>
-        <More kanban={kanban} />
-      </Row>
-      <TaskContainer>
-        {tasks?.map((task) => (
-          <TaskCard task={task} />
-        ))}
-        <CreateTask kanbanId={kanban.id} />
-      </TaskContainer>
-    </Container>
-  );
-};
+    return (
+      <Container {...props} ref={ref}>
+        <Row between={true}>
+          <h3>{kanban.name}</h3>
+          <More kanban={kanban} key={kanban.id} />
+        </Row>
+        <TaskContainer>
+          <Drop
+            type="ROW"
+            direction="vertical"
+            droppableId={"task" + kanban.id}
+          >
+            <DropChild style={{ minHeight: "5px" }}>
+              {tasks?.map((task, taskIndex) => (
+                <Drag
+                  key={task.id}
+                  index={taskIndex}
+                  draggableId={"task" + task.id}
+                >
+                  {/* 可是使用React.forwardRef 进行Ref转发, 也可以使用原生div标签进行包裹, 因为div 是可以接受Ref的 */}
+                  <div>
+                    <TaskCard key={task.id} task={task} />
+                  </div>
+                </Drag>
+              ))}
+            </DropChild>
+          </Drop>
+          <CreateTask kanbanId={kanban.id} />
+        </TaskContainer>
+      </Container>
+    );
+  }
+);
 
 const More = ({ kanban }: { kanban: Kanban }) => {
   const { mutateAsync } = useDeleteKanban(useKanbansQueryKey());

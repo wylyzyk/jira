@@ -1,10 +1,12 @@
 import { useHttp } from "network/http";
 import { QueryKey, useMutation, useQuery } from "react-query";
-import { Task } from "typing";
+import { SortProps, Task } from "typing";
 import {
   useAddConfig,
   useDeleteConfig,
   useEditConfig,
+  useReorderKanbanConfig,
+  useReorderTaskConfig,
 } from "./use-optimistic-options";
 
 export const useTasks = (param?: Partial<Task>) => {
@@ -57,4 +59,26 @@ export const useDeleteTask = (queryKey: QueryKey) => {
       method: "DELETE",
     });
   }, useDeleteConfig(queryKey));
+};
+
+export const useReorderKanban = (queryKey: QueryKey) => {
+  const client = useHttp();
+
+  return useMutation((params: SortProps) => {
+    return client("kanbans/reorder", {
+      method: "POST",
+      data: params,
+    });
+  }, useReorderKanbanConfig(queryKey));
+};
+
+export const useReorderTask = (queryKey: QueryKey) => {
+  const client = useHttp();
+
+  return useMutation((params: SortProps) => {
+    return client("tasks/reorder", {
+      data: params,
+      method: "POST",
+    });
+  }, useReorderTaskConfig(queryKey));
 };

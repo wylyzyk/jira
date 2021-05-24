@@ -47,3 +47,14 @@ export interface TaskType {
   id: number;
   name: string;
 }
+
+export interface SortProps {
+  // 要重新排序的 item
+  fromId: number;
+  // 目标 item
+  referenceId: number;
+  // 放在目标 item 的前还是后
+  type: "before" | "after";
+  fromKanbanId?: number;
+  toKanbanId?: number;
+}

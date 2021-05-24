@@ -1,6 +1,8 @@
 //乐观更新
 
 import { QueryKey, useQueryClient } from "react-query";
+import { Task } from "typing";
+import { reorder } from "utils/reorder";
 
 export const useConfig = (
   queryKey: QueryKey,
@@ -38,3 +40,23 @@ export const useEditConfig = (queryKey: QueryKey) =>
   );
 export const useAddConfig = (queryKey: QueryKey) =>
   useConfig(queryKey, (target, old) => (old ? [...old, target] : []));
+
+export const useReorderKanbanConfig = (queryKey: QueryKey) => {
+  return useConfig(queryKey, (target, old) =>
+    reorder({ list: old, ...target })
+  );
+};
+
+export const useReorderTaskConfig = (queryKey: QueryKey) => {
+  return useConfig(queryKey, (target, old) => {
+    // 客观更新task序列中的位置
+    const orderedList = reorder({ list: old, ...target }) as Task[];
+
+    // 由于task排序还可能涉及到所属kanban的改变, 所以还要改变kanbanId
+    return orderedList.map((item: Task) => {
+      return item.id === target.fromId
+        ? { ...item, kanbanId: target.toKanbanId }
+        : item;
+    });
+  });
+};
