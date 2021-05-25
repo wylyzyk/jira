@@ -315,12 +315,20 @@ export const useProjects = (param?: Partial<Project>) => {
 
 export const useUsers = (param?: Partial<Users>) => {
   const client = useHttp();
-  const { run, ...result } = useAsync<Users[]>();
 
-  useEffect(() => {
-    run(client("users", { data: cleanObject(param || {}) }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [param]);
-
-  return result;
+  return useQuery<Users[]>(["users", param], () => {
+    return client("users", { data: param });
+  });
 };
+
+// export const useUsers = (param?: Partial<Users>) => {
+//   const client = useHttp();
+//   const { run, ...result } = useAsync<Users[]>();
+
+//   useEffect(() => {
+//     run(client("users", { data: cleanObject(param || {}) }));
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [param]);
+
+//   return result;
+// };

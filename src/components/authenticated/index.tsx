@@ -10,7 +10,8 @@ import ProjectItem from "components/ProjectItem";
 import { resetRouter } from "utils";
 import Model from "components/ProjectList/Model";
 import ButtonNoPadding from "components/lib/Button";
-import PopOver from "components/PopOver";
+import ProjectPopOver from "components/PopOver/ProjectPopOver";
+import UserPopOver from "components/PopOver/UserPopOver";
 
 const Authenticated = () => {
   return (
@@ -40,8 +41,8 @@ const PageHeader = () => {
         <ButtonNoPadding type="link" onClick={resetRouter}>
           <h1>Welcome Jira!</h1>
         </ButtonNoPadding>
-        <PopOver />
-        <h3>用户</h3>
+        <ProjectPopOver />
+        <UserPopOver />
       </HeaderLeft>
       <HeaderRight>
         <User />

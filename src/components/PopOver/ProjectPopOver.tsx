@@ -4,9 +4,9 @@ import ButtonNoPadding from "components/lib/Button";
 import { useProjectModel, useProjects } from "hooks";
 import React from "react";
 
-const PopOver = () => {
+const ProjectPopOver = () => {
   const { open } = useProjectModel();
-  const { data: projects } = useProjects();
+  const { data: projects, refetch } = useProjects();
   const pinnedProjects = projects?.filter((project) => project.pin);
 
   const content = (
@@ -27,7 +27,11 @@ const PopOver = () => {
   );
 
   return (
-    <Popover placement="bottom" content={content}>
+    <Popover
+      onVisibleChange={() => refetch()}
+      placement="bottom"
+      content={content}
+    >
       <span>项目</span>
     </Popover>
   );
@@ -37,4 +41,4 @@ const ContentContainer = styled.div`
   min-width: 30rem;
 `;
 
-export default PopOver;
+export default ProjectPopOver;
