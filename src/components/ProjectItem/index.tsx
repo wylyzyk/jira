@@ -2,8 +2,8 @@ import { Menu } from "antd";
 import React from "react";
 import { Link } from "react-router-dom";
 import { Routes, Route, Navigate, useLocation } from "react-router";
-import KanBan from "./KanBan";
-import Epic from "./Epic";
+import KanBan from "./kanban";
+import Epic from "./epic";
 import styled from "@emotion/styled";
 
 const useRouteType = () => {
@@ -51,6 +51,7 @@ const Main = styled.div`
 `;
 
 const Container = styled.div`
+  width: 100%;
   display: grid;
   grid-template-columns: 16rem 1fr;
   overflow: hidden;
