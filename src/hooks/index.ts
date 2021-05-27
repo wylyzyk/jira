@@ -38,7 +38,6 @@ export const useProjectModel = () => {
   };
 };
 
-// TODO: 不能成功编辑项目
 export const useEditProject = (queryKey: QueryKey) => {
   const client = useHttp();
 
@@ -72,7 +71,6 @@ export const useEditProject = (queryKey: QueryKey) => {
   //#endregion
 };
 
-// TODO: 添加项目: 未完成, 且Drawer 不能正常给退出
 export const useAddProject = (queryKey: QueryKey) => {
   const client = useHttp();
 
