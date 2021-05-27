@@ -9,6 +9,7 @@ export const useConfig = (
   callback: (target: any, old?: any[]) => any[]
 ) => {
   const queryClient = useQueryClient();
+
   return {
     onSuccess: () => queryClient.invalidateQueries(queryKey),
     async onMutate(target: any) {
@@ -30,6 +31,7 @@ export const useDeleteConfig = (queryKey: QueryKey) =>
     queryKey,
     (target, old) => old?.filter((item) => item.id !== target.id) || []
   );
+
 export const useEditConfig = (queryKey: QueryKey) =>
   useConfig(
     queryKey,
@@ -38,6 +40,7 @@ export const useEditConfig = (queryKey: QueryKey) =>
         item.id === target.id ? { ...item, ...target } : item
       ) || []
   );
+
 export const useAddConfig = (queryKey: QueryKey) =>
   useConfig(queryKey, (target, old) => (old ? [...old, target] : []));
 
@@ -53,7 +56,7 @@ export const useReorderTaskConfig = (queryKey: QueryKey) => {
     const orderedList = reorder({ list: old, ...target }) as Task[];
 
     // 由于task排序还可能涉及到所属kanban的改变, 所以还要改变kanbanId
-    return orderedList.map((item: Task) => {
+    return orderedList.map((item) => {
       return item.id === target.fromId
         ? { ...item, kanbanId: target.toKanbanId }
         : item;

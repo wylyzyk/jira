@@ -2,6 +2,7 @@ import styled from "@emotion/styled";
 import { Spin } from "antd";
 import { Drag, Drop, DropChild } from "components/drag-and-drop";
 import { ScreenContainer } from "components/lib/lib";
+import { Profiler } from "components/Profiler";
 import { useDocumentTitle } from "hooks";
 import { useKanbans } from "hooks/kanban";
 import { useReorderKanban, useReorderTask, useTasks } from "hooks/task";
@@ -23,7 +24,7 @@ const KanBan = () => {
   useDocumentTitle("看板列表");
 
   const { data: currentProject } = useProjectInUrl();
-  const { data: kanbans = [], isLoading: kanbanIsLoading } = useKanbans(
+  const { data: kanbans, isLoading: kanbanIsLoading } = useKanbans(
     useKanbanSearchParams()
   );
   const { isLoading: taskIsLoading } = useTasks(useTaskSearchParams());
@@ -31,33 +32,35 @@ const KanBan = () => {
   const onDragEnd = useDragEnd();
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <ScreenContainer>
-        <h1>{currentProject?.name} 看板</h1>
-        <SearchPanel />
-        {isLoading ? (
-          <Spin size="large" />
-        ) : (
-          <ColumnsContainer>
-            <Drop type="COLUMN" direction="horizontal" droppableId="kanban">
-              <DropChild style={{ display: "flex" }}>
-                {kanbans.map((kanban, index) => (
-                  <Drag
-                    key={kanban.id}
-                    draggableId={"kanban" + kanban.id}
-                    index={index}
-                  >
-                    <KanbanColumn kanban={kanban} key={kanban.id} />
-                  </Drag>
-                ))}
-              </DropChild>
-            </Drop>
-            <CreateKanban />
-          </ColumnsContainer>
-        )}
-        <TaskModal />
-      </ScreenContainer>
-    </DragDropContext>
+    <Profiler id="看板页面">
+      <DragDropContext onDragEnd={onDragEnd}>
+        <ScreenContainer>
+          <h1>{currentProject?.name} 看板</h1>
+          <SearchPanel />
+          {isLoading ? (
+            <Spin size="large" />
+          ) : (
+            <ColumnsContainer>
+              <Drop type="COLUMN" direction="horizontal" droppableId="kanban">
+                <DropChild style={{ display: "flex" }}>
+                  {kanbans?.map((kanban, index) => (
+                    <Drag
+                      key={kanban.id}
+                      draggableId={"kanban" + kanban.id}
+                      index={index}
+                    >
+                      <KanbanColumn kanban={kanban} key={kanban.id} />
+                    </Drag>
+                  ))}
+                </DropChild>
+              </Drop>
+              <CreateKanban />
+            </ColumnsContainer>
+          )}
+          <TaskModal />
+        </ScreenContainer>
+      </DragDropContext>
+    </Profiler>
   );
 };
 
@@ -88,12 +91,12 @@ export const useDragEnd = () => {
 
       // task 排序
       if (type === "ROW") {
-        const fromKanbanId = Number(source.droppableId);
-        const toKanbanId = Number(destination.droppableId);
+        const fromKanbanId = +source.droppableId;
+        const toKanbanId = +destination.droppableId;
 
-        if (fromKanbanId === toKanbanId) {
-          return;
-        }
+        // if (fromKanbanId === toKanbanId) {
+        //   return;
+        // }
 
         const fromTask = allTask.filter(
           (task) => task.kanbanId === fromKanbanId

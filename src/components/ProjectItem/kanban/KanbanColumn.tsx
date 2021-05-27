@@ -10,18 +10,19 @@ import { Kanban, Task } from "typing";
 import { CreateTask } from "./CreateTask";
 import Mark from "./mark";
 import { useKanbansQueryKey, useTaskModal, useTaskSearchParams } from "./until";
+import taskIcon from "assets/task.svg";
+import bugIcon from "assets/bug.svg";
 
-// const TaskTypeIcon = ({ id }: { id: number }) => {
-//   const { data: taskTypes } = useTaskTypes();
-//   const name = taskTypes?.find((taskType) => taskType.id === id)?.name;
+const TaskTypeIcon = ({ id }: { id: number }) => {
+  const { data: taskTypes } = useTaskTypes();
+  const name = taskTypes?.find((taskType) => taskType.id === id)?.name;
 
-//   if (!name) {
-//     return null;
-//   }
+  if (!name) {
+    return null;
+  }
 
-//   // TODO: taskIcon 和 bugIcon 未引入
-//   return <img alt="task-icon" src={name === "task" ? taskIcon : bugIcon} />
-// };
+  return <img alt="task-icon" src={name === "task" ? taskIcon : bugIcon} />;
+};
 
 const TaskCard = ({ task }: { task: Task }) => {
   const { startEdit } = useTaskModal();
@@ -36,7 +37,7 @@ const TaskCard = ({ task }: { task: Task }) => {
       <p>
         <Mark keyword={keyword} name={task.name} />
       </p>
-      {/* <TaskTypeIcon id={task.id} /> */}
+      <TaskTypeIcon id={task.typeId} />
     </Card>
   );
 };
@@ -44,7 +45,7 @@ const TaskCard = ({ task }: { task: Task }) => {
 const KanbanColumn = forwardRef<HTMLDivElement, { kanban: Kanban }>(
   ({ kanban, ...props }, ref) => {
     const { data: allTasks } = useTasks(useTaskSearchParams());
-    const tasks = allTasks?.filter((task) => task.projectId === kanban.id);
+    const tasks = allTasks?.filter((task) => task.kanbanId === kanban.id);
 
     return (
       <Container {...props} ref={ref}>
@@ -53,19 +54,15 @@ const KanbanColumn = forwardRef<HTMLDivElement, { kanban: Kanban }>(
           <More kanban={kanban} key={kanban.id} />
         </Row>
         <TaskContainer>
-          <Drop
-            type="ROW"
-            direction="vertical"
-            droppableId={"task" + kanban.id}
-          >
-            <DropChild style={{ minHeight: "5px" }}>
+          <Drop type="ROW" direction="vertical" droppableId={String(kanban.id)}>
+            <DropChild style={{ minHeight: "1rem" }}>
               {tasks?.map((task, taskIndex) => (
                 <Drag
                   key={task.id}
                   index={taskIndex}
                   draggableId={"task" + task.id}
                 >
-                  {/* 可是使用React.forwardRef 进行Ref转发, 也可以使用原生div标签进行包裹, 因为div 是可以接受Ref的 */}
+                  {/* 可以React.forwardRef 进行Ref转发, 也可以使用原生div标签进行包裹, 因为div 是可以接受Ref的 */}
                   <div>
                     <TaskCard key={task.id} task={task} />
                   </div>
@@ -82,7 +79,7 @@ const KanbanColumn = forwardRef<HTMLDivElement, { kanban: Kanban }>(
 
 const More = ({ kanban }: { kanban: Kanban }) => {
   const { mutateAsync } = useDeleteKanban(useKanbansQueryKey());
-  const startEdit = () => {
+  const startDelete = () => {
     Modal.confirm({
       okText: "确定",
       cancelText: "取消",
@@ -96,7 +93,7 @@ const More = ({ kanban }: { kanban: Kanban }) => {
   const overlay = (
     <Menu>
       <Menu.Item>
-        <Button type="link" onClick={startEdit}>
+        <Button type="link" onClick={startDelete}>
           删除
         </Button>
       </Menu.Item>

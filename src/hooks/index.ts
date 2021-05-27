@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { QueryKey, useMutation, useQuery } from "react-query";
 import { URLSearchParamsInit, useSearchParams } from "react-router-dom";
 import { Project, Users } from "typing";
-import { cleanObject } from "utils";
+import { cleanObject, subset } from "utils";
 import {
   useAddConfig,
   useDeleteConfig,
@@ -86,12 +86,11 @@ export const useAddProject = (queryKey: QueryKey) => {
   );
 };
 
-// TODO: 未知问题, 未实现
 export const useDeleteProject = (queryKey: QueryKey) => {
   const client = useHttp();
 
   return useMutation(
-    (id: { id: number }) => client(`projects/${id}`, { method: "DELETE" }),
+    ({ id }: { id: number }) => client(`projects/${id}`, { method: "DELETE" }),
     useDeleteConfig(queryKey)
   );
 };
@@ -110,21 +109,22 @@ export const useProject = (id?: number) => {
 export const useUrlQueryParam = <T extends string>(keys: T[]) => {
   const [searchParams] = useSearchParams();
   const setSearchParams = useSetUrlSearchParam();
+  const [stateKeys] = useState(keys);
 
   return [
     useMemo(() => {
-      return keys.reduce((prev, key) => {
-        return { ...prev, [key]: searchParams.get(key) || "" };
-      }, {} as { [key in T]: string });
+      // return keys.reduce((prev, key) => {
+      //   return { ...prev, [key]: searchParams.get(key) || "" };
+      // }, {} as { [key in T]: string });
 
-      // return subset(Object.fromEntries(searchParams), stateKeys) as {[key in T]: string}
-    }, [searchParams, keys]),
+      return subset(Object.fromEntries(searchParams), stateKeys) as {
+        [key in T]: string;
+      };
+    }, [searchParams, stateKeys]),
     (params: Partial<{ [key in T]: unknown }>) => {
-      // const o = cleanObject({
-      //   ...Object.fromEntries(searchParams),
-      //   ...params,
-      // }) as URLSearchParamsInit;
       return setSearchParams(params);
+
+      // return setSearchParams(params);
     },
   ] as const;
 };
@@ -172,7 +172,7 @@ export function useDebounce<T>(value: T, delay?: number) {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setDebounceValue(value);
+      return setDebounceValue(value);
     }, delay);
 
     // 在上一次useEffect处理完后会执行
@@ -291,7 +291,7 @@ export const useProjects = (param?: Partial<Project>) => {
   const client = useHttp();
 
   // useQuery 第一个参数 数组中的值发生变化时, 请求会重新触发
-  return useQuery<Project[]>(["projects", param], () =>
+  return useQuery<Project[]>(["projects", cleanObject(param)], () =>
     client("projects", { data: param })
   );
   //#region

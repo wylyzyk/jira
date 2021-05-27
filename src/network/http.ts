@@ -1,5 +1,6 @@
 import { useAuth } from "context/auth-context";
 import qs from "qs";
+import { useCallback } from "react";
 import * as auth from "../auth-provider";
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -26,9 +27,10 @@ export const http = async (
   if (config.method.toUpperCase() === "GET") {
     endpoint += `?${qs.stringify(data)}`;
   } else {
-    config.body = qs.stringify(data || {});
+    config.body = JSON.stringify(data || {});
   }
 
+  // axios 和 fetch 表现不一样, axios 可以直接在返回状态不为2xx 的时候抛出异常
   return window
     .fetch(`${apiUrl}/${endpoint}`, config)
     .then(async (response) => {
@@ -53,6 +55,9 @@ export const useHttp = () => {
   const { user } = useAuth();
 
   // 使用rest操作符, 将 tuple 中的值结构出来
-  return (...[endpoint, config]: Parameters<typeof http>) =>
-    http(endpoint, { ...config, token: user?.token });
+  return useCallback(
+    (...[endpoint, config]: Parameters<typeof http>) =>
+      http(endpoint, { ...config, token: user?.token }),
+    [user?.token]
+  );
 };

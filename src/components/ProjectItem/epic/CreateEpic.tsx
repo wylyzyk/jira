@@ -1,10 +1,9 @@
+import styled from "@emotion/styled";
 import { Button, Drawer, DrawerProps, Form, Input, Spin } from "antd";
 import { useForm } from "antd/lib/form/Form";
 import { ErrorBox } from "components/lib/FullPageLoading";
-import UserSelect from "components/UserSelect";
 import { useAddEpic } from "hooks/epic";
 import React, { useEffect } from "react";
-import { Container } from "../kanban/KanbanColumn";
 import { useProjectIdInUrl } from "../kanban/until";
 import { useEpicQueryKey } from "./util";
 
@@ -65,3 +64,11 @@ export const CreateEpic = (
     </Drawer>
   );
 };
+
+const Container = styled.div`
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;

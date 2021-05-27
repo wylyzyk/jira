@@ -29,6 +29,7 @@ const bootsUser = async () => {
 };
 
 const AuthContext = createContext<IProps | undefined>(undefined);
+
 AuthContext.displayName = "AuthContext";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -44,6 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const queryClient = useQueryClient();
 
+  // point free
   const login = (form: AuthForm) => auth.login(form).then(setUser);
 
   const register = (form: AuthForm) => auth.register(form).then(setUser);
@@ -55,7 +57,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       queryClient.clear();
     });
 
-  useMount(() => run(bootsUser()));
+  useMount(() => {
+    run(bootsUser());
+  });
 
   if (isIdle || isLoading) {
     return <FullPageLoading />;

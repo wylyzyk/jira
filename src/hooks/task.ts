@@ -1,6 +1,6 @@
 import { useHttp } from "network/http";
 import { QueryKey, useMutation, useQuery } from "react-query";
-import { SortProps, Task } from "typing";
+import { Project, SortProps, Task } from "typing";
 import {
   useAddConfig,
   useDeleteConfig,
@@ -43,10 +43,10 @@ export const useEditTask = (queryKey: QueryKey) => {
   );
 };
 
-export const useTask = (id: number) => {
+export const useTask = (id?: number) => {
   const client = useHttp();
 
-  return useQuery(["task", { id }], () => client(`tasks${id}`), {
+  return useQuery<Project>(["task", { id }], () => client(`tasks/${id}`), {
     enabled: !!id,
   });
 };
