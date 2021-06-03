@@ -3,6 +3,7 @@ import { Row } from "components/style/lib";
 import { TaskTypeSelect } from "components/TaskTypeSelect";
 import UserSelect from "components/UserSelect";
 import { useSetUrlSearchParam } from "hooks";
+import React from "react";
 import { useTaskSearchParams } from "./until";
 
 const SearchPanel = () => {
