@@ -12,7 +12,16 @@ interface IProps extends TableProps<Project> {
   users: Users[];
 }
 
-const List: FC<IProps> = ({ users, ...props }) => {
+/**
+ * memo 会在两种情况下进行冲洗渲染
+ * 1. React.memo() 会浅对比 props, 发生改变重新渲染
+ * 2. 在 Redux 这种状态管理下, 状态改变也会跟着改变
+ *
+ * React.memo()和useMemo() 的区别
+ * React.memo() 是用来包裹一个组件
+ * useMemo() 是用来包裹一个值
+ */
+const List: FC<IProps> = React.memo(({ users, ...props }) => {
   const { mutate } = useEditProject(useProjectQueryKey());
   // 函数柯里化 point free
   const pinProject = (id: number) => (pin: boolean) => mutate({ id, pin });
@@ -77,7 +86,7 @@ const List: FC<IProps> = ({ users, ...props }) => {
       {...props}
     />
   );
-};
+});
 
 const More = ({ project }: { project: Project }) => {
   const { startEdit } = useProjectModel();

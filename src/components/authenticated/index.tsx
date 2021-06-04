@@ -16,20 +16,18 @@ import UserPopOver from "components/PopOver/UserPopOver";
 const Authenticated = () => {
   return (
     <Container>
-      <Router>
-        <PageHeader />
-        <Main>
-          <Routes>
-            <Route path={"/projects"} element={<ProjectList />}></Route>
-            <Route
-              path={"/projects/:projectId/*"}
-              element={<ProjectItem />}
-            ></Route>
-            <Navigate to="/projects" />
-          </Routes>
-        </Main>
-        <Model />
-      </Router>
+      <PageHeader />
+      <Main>
+        <Routes>
+          <Route path={"/projects"} element={<ProjectList />}></Route>
+          <Route
+            path={"/projects/:projectId/*"}
+            element={<ProjectItem />}
+          ></Route>
+          <Navigate to="/projects" />
+        </Routes>
+      </Main>
+      <Model />
     </Container>
   );
 };
