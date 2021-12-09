@@ -37,7 +37,7 @@ const PageHeader = () => {
     <Header between={true}>
       <HeaderLeft gap={true}>
         <ButtonNoPadding type="link" onClick={resetRouter}>
-          <h1>Welcome Jira!</h1>
+          <h1 style={{ padding: "5px" }}>Welcome SuperTask !</h1>
         </ButtonNoPadding>
         <ProjectPopOver />
         <UserPopOver />

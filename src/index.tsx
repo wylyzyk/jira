@@ -10,7 +10,7 @@ loadServer(() =>
   ReactDOM.render(
     <React.StrictMode>
       <AppProvider>
-        <DevTools />
+        {/* <DevTools /> */}
         <App />
       </AppProvider>
     </React.StrictMode>,

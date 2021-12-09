@@ -44,7 +44,7 @@ const Title = styled.h2`
 
 const ShadowCard = styled(Card)`
   width: 40rem;
-  min-height: 56rem;
+  min-height: 50rem;
   padding: 3.2rem 4rem;
   border-radius: 0.3rem;
   box-sizing: border-box;
@@ -57,6 +57,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
+  margin-top: 50px;
 `;
 
 export default Unauthenticated;
